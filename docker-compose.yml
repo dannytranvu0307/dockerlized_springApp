@@ -13,7 +13,8 @@ services:
       - "3307:3306"
     volumes:
       - ./flyPJ_db:/docker-entrypoint-initdb.d
-      - ./dist/mysql_data:/var/lib/mysql
+      - mysql-fly-data:/var/lib/mysql
+      - mysql-config:/etc/mysql/conf.d
     networks:
       - backend
   app:
@@ -44,4 +45,6 @@ networks:
   backend:
     driver: bridge
 volumes:
+  mysql-fly-data:
+  mysql-config:
   fly:
