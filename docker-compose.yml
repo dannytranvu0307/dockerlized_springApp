@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    environment:
+      TZ: Asia/Tokyo
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: fly_project
+      MYSQL_USER: vupilot
+      MYSQL_PASSWORD: anhlacho
+    ports:
+      - "3307:3306"
+    volumes:
+      - ./flyPJ_db:/docker-entrypoint-initdb.d
+      - ./dist/mysql_data:/var/lib/mysql
+    networks:
+      - backend
+  app:
+    build: .
+    container_name: fly-backend
+    restart: always
+    depends_on:
+      - mysql
+      - redis
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://host.docker.internal:3307/fly_project
+    ports:
+      - 8080:8080
+    networks:
+      - backend
+  redis:
+    image: redis:7.0
+    container_name: fly-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./redis-data:/data
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
+    command: redis-server /usr/local/etc/redis/redis.conf
+    networks:
+     - backend
+networks:
+  backend:
+    driver: bridge
+volumes:
+  fly:
